@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ticketistan · Team & Organisation</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#0D2B4E;--teal:#0F6E56;--tm:#1D9E75;--t50:#E1F5EE;--t100:#9FE1CB;--t200:#5DCAA5;
+  --pur:#534AB7;--p50:#EEEDFE;--p100:#CECBF6;--amb:#854F0B;--a50:#FAEEDA;--a100:#FAC775;
+  --b50:#E3F2FD;--b600:#185FA5;--red:#A32D2D;--r50:#FCEBEB;
+  --bd:#E8E6E0;--bd2:#D4D1C8;--tx:#1C1A17;--tx2:#6B6860;--tx3:#A09D97;--sf:#F9F8F5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0a1628}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px 12px;font-family:'Plus Jakarta Sans',sans-serif}
+.deck{width:100%;max-width:1280px}
+.slide-wrap{width:100%;max-width:1280px;aspect-ratio:16/9;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.slide{position:absolute;inset:0;background:#fff;display:none;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif}
+.slide.active{display:flex;flex-direction:column}
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;gap:16px}
+.nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:9px 24px;border-radius:7px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+.nav-btn:hover{background:rgba(255,255,255,.2)}
+.nav-btn:disabled{opacity:.25;cursor:default}
+.slide-counter{color:rgba(255,255,255,.55);font-size:12px;font-weight:600;letter-spacing:.06em;text-align:center;min-width:100px}
+.progress-bar{flex:1;height:2px;background:rgba(255,255,255,.1);border-radius:1px;max-width:300px}
+.progress-fill{height:100%;background:var(--teal);border-radius:1px;transition:width .3s ease}
+.kb-hint{font-size:11px;color:rgba(255,255,255,.3)}
+.eyebrow{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.slide-h2{font-family:'Outfit',sans-serif;font-weight:800;color:var(--navy);line-height:1.1;letter-spacing:-.5px}
+.slide-h3{font-family:'Outfit',sans-serif;font-weight:700;color:var(--navy);line-height:1.2}
+.slide-body{color:var(--tx2);line-height:1.65}
+.tl{color:var(--teal)}
+.slide-footer{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--tm) 50%,var(--t100))}
+.slide-num{position:absolute;bottom:14px;right:24px;font-family:'Outfit',sans-serif;font-size:10px;color:var(--bd2);font-weight:600;letter-spacing:.08em}
+.slide-brand{position:absolute;bottom:14px;left:24px;font-family:'Outfit',sans-serif;font-size:10px;color:var(--bd2);font-weight:700;letter-spacing:.1em;display:flex;align-items:center;gap:5px}
+.bar{width:44px;height:4px;background:var(--teal);border-radius:2px;margin-bottom:14px;flex-shrink:0}
+.card{background:var(--sf);border:.5px solid var(--bd);border-radius:10px;padding:18px}
+.card-nv{background:var(--navy);border-radius:10px;padding:18px;color:#fff}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px}
+.b-tl{background:var(--t50);color:#085041}
+.b-nv{background:var(--navy);color:#fff}
+.b-amb{background:var(--a50);color:var(--amb)}
+.b-b{background:var(--b50);color:var(--b600)}
+.flex{display:flex}.gap8{gap:8px}.gap12{gap:12px}
+.align-c{align-items:center}.just-sb{justify-content:space-between}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.fn-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;margin:2px}
+.fn-tl{background:var(--t50);color:#085041;border:.5px solid rgba(15,110,86,.2)}
+.fn-b{background:var(--b50);color:var(--b600);border:.5px solid rgba(24,95,165,.2)}
+.fn-amb{background:var(--a50);color:var(--amb);border:.5px solid rgba(133,79,11,.2)}
+.fn-shared{background:var(--p50);color:var(--pur);border:.5px solid rgba(83,74,183,.2)}
+.asset-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:.5px solid var(--bd);border-radius:6px;padding:4px 9px;font-size:10.5px;font-weight:600;color:var(--tx);margin:2px}
+.asset-chip-tl{background:var(--t50);border-color:rgba(15,110,86,.25);color:#085041}
+.asset-chip-b{background:var(--b50);border-color:rgba(24,95,165,.25);color:var(--b600)}
+.asset-chip-amb{background:var(--a50);border-color:rgba(133,79,11,.25);color:var(--amb)}
+/* EDITOR STYLES */
+#edit-bar{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#0D2B4E;display:flex;align-items:center;gap:12px;padding:10px 24px;box-shadow:0 -2px 12px rgba(0,0,0,.4);font-family:'Plus Jakarta Sans',sans-serif;flex-wrap:wrap}
+.ebar-btn{border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;white-space:nowrap}
+#edit-toggle{background:#0F6E56;color:#fff}
+#edit-toggle.active{background:#534AB7}
+#drag-toggle{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
+#drag-toggle.active{background:#854F0B;color:#fff}
+#edit-hint{font-size:11px;color:rgba(255,255,255,.5);flex:1;min-width:160px}
+#dl-btn{background:#1D9E75;color:#fff;display:none}
+#dl-btn.show{display:flex}
+#undo-btn{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);display:none}
+#undo-btn.show{display:flex}
+#change-count{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.6);display:none}
+#change-count.show{display:block}
+.slide-editable [data-editable]:hover{outline:2px dashed rgba(29,158,117,.6);outline-offset:2px;cursor:text;border-radius:3px}
+.slide-editable [data-editable]:focus{outline:2px solid #1D9E75!important;outline-offset:3px;border-radius:3px;background:rgba(225,245,238,.15)}
+.drag-mode .slide *:not(.slide-footer):not(.slide-brand):not(.slide-num){cursor:grab!important}
+.drag-highlight{outline:2px dashed #854F0B!important;outline-offset:3px;border-radius:4px}
+.dragging-el{cursor:grabbing!important;outline:2px solid #854F0B!important;outline-offset:3px;border-radius:4px;opacity:.85;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.18)!important}
+.drag-tooltip{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#854F0B;color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;pointer-events:none;z-index:9998;font-family:'Plus Jakarta Sans',sans-serif;display:none;letter-spacing:.04em}
+.drag-tooltip.show{display:block}
+
+.slide-wrap-holder{width:100%;max-width:1280px;position:relative;}
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width:1279px){
+  body{
+    justify-content:flex-start!important;
+    align-items:flex-start!important;
+    padding:0!important;
+    min-height:auto!important;
+  }
+  .deck{
+    width:100vw!important;
+    max-width:100vw!important;
+    padding:0;
+  }
+  .slide-wrap{
+    aspect-ratio:unset!important;
+    max-width:unset!important;
+    box-shadow:none;
+  }
+  .nav-row{padding:10px 12px 4px}
+  .nav-btn{padding:9px 18px;font-size:13px}
+  .progress-bar{max-width:80px}
+  .kb-hint{display:none}
+  #edit-bar{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .ebar-btn{padding:6px 10px;font-size:11px}
+  #edit-hint{display:none}
+}
+</style>
+<script>
+/* ── SLIDE SCALING ──
+   Scales only the slide-wrap to fit screen width.
+   The nav row lives OUTSIDE slide-wrap so we never clip it. */
+var DESIGN_W=1280,DESIGN_H=720;
+function fitDeck(){
+  var wrap=document.querySelector('.slide-wrap');
+  var holder=document.querySelector('.slide-wrap-holder');
+  if(!wrap)return;
+  var vw=window.innerWidth;
+  if(vw<1280){
+    var scale=vw/DESIGN_W;
+    wrap.style.width=DESIGN_W+'px';
+    wrap.style.height=DESIGN_H+'px';
+    wrap.style.transform='scale('+scale+')';
+    wrap.style.transformOrigin='top left';
+    /* Collapse the holder div to the visual scaled height
+       so the nav row sits flush below the slide */
+    if(holder){
+      holder.style.height=Math.round(DESIGN_H*scale)+'px';
+      holder.style.overflow='hidden';
+    }
+  } else {
+    wrap.style.cssText='';
+    if(holder){
+      holder.style.height='';
+      holder.style.overflow='';
+    }
+  }
+}
+window.addEventListener('load',fitDeck);
+window.addEventListener('resize',fitDeck);
+</script>
+</head>
+<body>
+<div class="deck">
+<div class="slide-wrap-holder">
+<div class="slide-wrap">
+
+<!--SLIDE-WRAP-START-->
+<div class="slide active" id="s1">
+  <div style="height:100%;padding:34px 48px 44px;display:flex;flex-direction:column">
+    <div class="flex just-sb align-c" style="margin-bottom:14px;flex-shrink:0">
+      <div>
+        <div class="eyebrow">The Founding Team</div>
+        <div class="bar" style="margin-bottom:6px"></div>
+        <div class="slide-h2" style="font-size:32px">Three co-founders. Equal partners.<br/><span class="tl">One unfair advantage.</span></div>
+      </div>
+      <div style="background:var(--navy);border-radius:12px;padding:14px 20px;text-align:center;flex-shrink:0">
+        <div style="font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--t100);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px">Equity Structure</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1">33 · 33 · 33</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">Equal split — the Airbnb model</div>
+      </div>
+    </div>
+    <div style="background:var(--p50);border:.5px solid var(--pur);border-radius:9px;padding:10px 18px;margin-bottom:12px;flex-shrink:0;display:flex;align-items:center;gap:16px">
+      <div style="width:32px;height:32px;border-radius:8px;background:var(--pur);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤝</div>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--pur);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">Investor Relations — Shared Accountability Across All Three Co-Founders</div>
+        <div style="font-size:11.5px;color:var(--tx2);line-height:1.45">All three co-founders are active participants in investor conversations. Aamir leads the fundraising narrative and institutional outreach. Mohamed brings 30 years of operator credibility, a PKR 3B IATA guarantee, and the balance sheet of a 16-company group — the most de-risked co-founder position any investor will see. Farman reinforces commercial traction and supply-side validation in every room.</div>
+      </div>
+    </div>
+    <div class="g3" style="flex:1;gap:14px">
+      <div style="border:.5px solid var(--bd);border-radius:12px;background:#fff;border-top:3px solid var(--teal);display:flex;flex-direction:column;padding:16px 18px;gap:10px">
+        <div class="flex align-c gap8">
+          <div style="width:38px;height:38px;border-radius:9px;background:var(--t50);border:1px solid rgba(15,110,86,.25);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--teal);flex-shrink:0">A</div>
+          <div style="flex:1"><div class="slide-h3" style="font-size:15px">Aamir</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal);margin-top:1px">Co-Founder & CEO</div></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;color:var(--teal)">33%</div>
+        </div>
+        <div class="slide-body" style="font-size:11.5px;line-height:1.55">Serial travel-tech founder across GCC and Pakistan. Built and exited Eilago (SAR 150M+), scaled $100M+ GMV at Ejazah. Architects the product vision, AI stack, and investor story that makes Ticketistan fundable at institutional scale.</div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Functions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="fn-pill fn-tl">📱 Product</span><span class="fn-pill fn-tl">⚙️ Technology</span><span class="fn-pill fn-tl">📣 Marketing</span><span class="fn-pill fn-tl">🤖 Data & AI</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div class="flex gap8" style="flex-wrap:wrap;margin-top:auto">
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">SAR 700M+</div><div style="font-size:9.5px;color:var(--tx3)">Topline built</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">$18.2M</div><div style="font-size:9.5px;color:var(--tx3)">PnP valuation</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">20+ yrs</div><div style="font-size:9.5px;color:var(--tx3)">Travel tech</div></div>
+        </div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;background:#fff;border-top:3px solid var(--b600);display:flex;flex-direction:column;padding:16px 18px;gap:10px">
+        <div class="flex align-c gap8">
+          <div style="width:38px;height:38px;border-radius:9px;background:var(--b50);border:1px solid rgba(24,95,165,.25);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--b600);flex-shrink:0">M</div>
+          <div style="flex:1"><div class="slide-h3" style="font-size:15px">Mohamed</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--b600);margin-top:1px">Co-Founder & President</div></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;color:var(--b600)">33%</div>
+        </div>
+        <div class="slide-body" style="font-size:11.5px;line-height:1.55">Built Pakistan's largest airline ticket consolidation business from a one-man operation in 1996. The Fazale Rabbi Group — 16 companies, 1,200 staff, $250M revenue — is the infrastructure Ticketistan launches from. Mohamed doesn't just bring capital; he brings 30 years of execution muscle.</div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Functions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="fn-pill fn-b">💳 Finance</span><span class="fn-pill fn-b">🏗️ Operations</span><span class="fn-pill fn-b">🏢 Business Infrastructure</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div class="flex gap8" style="flex-wrap:wrap;margin-top:auto">
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">$250M</div><div style="font-size:9.5px;color:var(--tx3)">Annual revenue</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">16 cos</div><div style="font-size:9.5px;color:var(--tx3)">Fazale Rabbi Group</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">25M+</div><div style="font-size:9.5px;color:var(--tx3)">Customers served</div></div>
+        </div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;background:#fff;border-top:3px solid var(--amb);display:flex;flex-direction:column;padding:16px 18px;gap:10px">
+        <div class="flex align-c gap8">
+          <div style="width:38px;height:38px;border-radius:9px;background:var(--a50);border:1px solid rgba(133,79,11,.25);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--amb);flex-shrink:0">F</div>
+          <div style="flex:1"><div class="slide-h3" style="font-size:15px">Farman</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--amb);margin-top:1px">Co-Founder & Chief Business Officer</div></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:900;color:var(--amb)">33%</div>
+        </div>
+        <div class="slide-body" style="font-size:11.5px;line-height:1.55">Pakistan's leading Umrah wholesaler and one of the country's largest B2B travel operators. Built a multi-billion rupee topline business over 30 years, with PKR 10B+ in annualized B2B sales. Farman doesn't need to build a supply network — he's bringing one that already dominates the market.</div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Functions</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="fn-pill fn-amb">✈️ Suppliers</span><span class="fn-pill fn-amb">🔗 Partners</span><span class="fn-pill fn-amb">🏦 B2B Business</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div class="flex gap8" style="flex-wrap:wrap;margin-top:auto">
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">PKR 10B+</div><div style="font-size:9.5px;color:var(--tx3)">B2B sales p.a.</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">#1</div><div style="font-size:9.5px;color:var(--tx3)">Umrah wholesaler</div></div>
+          <div class="card" style="padding:5px 9px;flex:1"><div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;color:var(--navy)">30 yrs</div><div style="font-size:9.5px;color:var(--tx3)">B2B expertise</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T1 / T6</div>
+</div>
+<!--SLIDE:s1:END-->
+
+<!--SLIDE:s2:START-->
+<div class="slide" id="s2">
+  <div style="height:100%;padding:20px 48px 56px;display:flex;flex-direction:column;gap:6px">
+    <div class="flex just-sb align-c" style="flex-shrink:0;margin-bottom:0">
+      <div>
+        <div class="eyebrow">Founding Capital</div>
+        <div class="bar" style="margin-bottom:4px"></div>
+        <div class="slide-h2" style="font-size:26px">What we each bring.<br/><span class="tl">Why it's equally critical.</span></div>
+      </div>
+      <div style="background:var(--navy);border-radius:12px;padding:10px 14px;max-width:280px;flex-shrink:0">
+        <div style="font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--t100);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Why equal equity — the Airbnb model</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,.75);line-height:1.5">Airbnb's Chesky, Gebbia and Blecharczyk split equally despite wildly different skills. They've publicly called it their best structural decision. Equal ownership means equal accountability, equal urgency, and zero politics at the moment you need speed most.</div>
+        <div style="margin-top:6px;padding-top:6px;border-top:.5px solid rgba(255,255,255,.1);font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:#fff;text-align:center">33 · 33 · 33</div>
+      </div>
+    </div>
+    <div class="g3" style="flex:1;gap:10px">
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--t50);border-bottom:.5px solid var(--teal);padding:9px 14px"><div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:13px">Aamir</div><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-top:1px">CEO · Product · Tech · Marketing · Data & AI</div></div><div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:900;color:var(--teal)">33%</div></div></div>
+        <div style="padding:10px 14px;flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Why this contribution is critical</div>
+          <div style="font-size:11px;color:var(--tx2);line-height:1.5">Without someone who has built OTAs from zero and shipped live travel fintech, you're learning on investors' money. Without AI and stack depth, the roadmap stays theoretical. Without $1B+ scale exposure, you don't know what breaks. Without the investor network, the seed round doesn't close. <strong style="color:var(--navy)">Aamir's contribution is the one thing in this cap table that can't be hired, bought, or replicated.</strong></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Current assets — available now</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="asset-chip asset-chip-tl">🏗️ OTA build capability — zero to live</span><span class="asset-chip asset-chip-tl">💳 Travel fintech — product design & delivery</span><span class="asset-chip asset-chip-tl">🤖 AI & LLM stack — hands-on, production-ready</span><span class="asset-chip asset-chip-tl">📈 $1B+ scale — knows what breaks at volume</span><span class="asset-chip asset-chip-tl">🔌 GDS & NDC — deep operator relationships</span><span class="asset-chip asset-chip-tl">🌐 GCC & global investor network</span></div>
+        </div>
+        <div style="padding:7px 14px;background:var(--t50);border-top:.5px solid var(--teal)"><div style="font-size:10px;color:var(--teal);font-weight:600;line-height:1.35">🔑 The reason Ticketistan launches with AI-ready tech, a proven GTM playbook, and a leader who has done this at scale.</div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--b50);border-bottom:.5px solid var(--b600);padding:9px 14px"><div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:13px">Mohamed</div><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--b600);margin-top:1px">President · Finance · Operations · Infrastructure</div></div><div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:900;color:var(--b600)">33%</div></div></div>
+        <div style="padding:10px 14px;flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Why this contribution is critical</div>
+          <div style="font-size:11px;color:var(--tx2);line-height:1.5">Without a PKR 3B IATA BSP bank guarantee, you can't consolidate airline tickets at scale. Without 30 years of supplier trust, you negotiate from zero. Without 25M customer relationships, B2C takes years to build. <strong style="color:var(--navy)">Mohamed's contribution means Ticketistan inherits an unfair head start that no seed capital can buy.</strong></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Current assets — available now</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="asset-chip asset-chip-b">💰 Primary working capital</span><span class="asset-chip asset-chip-b">🏦 PKR 3B IATA BSP guarantee</span><span class="asset-chip asset-chip-b">✈️ Largest ticket consolidator — Pakistan</span><span class="asset-chip asset-chip-b">👥 1,200-person operational group</span><span class="asset-chip asset-chip-b">🤝 30 yrs supplier & banking relationships</span><span class="asset-chip asset-chip-b">📋 25M customers — B2B & B2C</span></div>
+        </div>
+        <div style="padding:7px 14px;background:var(--b50);border-top:.5px solid var(--b600)"><div style="font-size:10px;color:var(--b600);font-weight:600;line-height:1.35">🔑 The reason Ticketistan has infrastructure, credibility and supply from day one — not year three.</div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--a50);border-bottom:.5px solid var(--amb);padding:9px 14px"><div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:13px">Farman</div><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amb);margin-top:1px">CBO · Suppliers · Partners · B2B Business</div></div><div style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:900;color:var(--amb)">33%</div></div></div>
+        <div style="padding:10px 14px;flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Why this contribution is critical</div>
+          <div style="font-size:11px;color:var(--tx2);line-height:1.5">Without live airline supply, there is no product to sell. Without PKR 10B+ in proven B2B relationships, corporate revenue takes years to build. Without Pakistan's leading Umrah wholesaler in the room, the biggest travel category in the market is closed. <strong style="color:var(--navy)">Farman's contribution means Ticketistan enters with the largest B2B book in Pakistan already behind it.</strong></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3)">Current assets — available now</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0"><span class="asset-chip asset-chip-amb">✈️ Airline supply — direct contracts</span><span class="asset-chip asset-chip-amb">🕌 #1 Umrah wholesaler — Pakistan</span><span class="asset-chip asset-chip-amb">💼 PKR 10B+ annualized B2B sales</span><span class="asset-chip asset-chip-amb">🔗 Trade & agent channel network</span><span class="asset-chip asset-chip-amb">🏨 Hotel & ground inventory</span><span class="asset-chip asset-chip-amb">💰 Co-investment capital</span></div>
+        </div>
+        <div style="padding:7px 14px;background:var(--a50);border-top:.5px solid var(--amb)"><div style="font-size:10px;color:var(--amb);font-weight:600;line-height:1.35">🔑 The reason Ticketistan enters with PKR 10B+ of B2B relationships and Pakistan's #1 Umrah supply on day one.</div></div>
+      </div>
+    </div>
+    <div style="background:var(--navy);border-radius:10px;padding:7px 16px;flex-shrink:0"><div style="color:rgba(255,255,255,.8);font-size:11px;line-height:1.45;text-align:center"><strong style="color:var(--t100)">Three different strengths. Three equal stakes. All three non-negotiable.</strong> Remove any one founder and the business either can't raise, can't operate, or can't sell — equal equity isn't just fair, it's structurally correct.</div></div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T2 / T6</div>
+</div>
+<!--SLIDE:s2:END-->
+
+<!--SLIDE:s3:START-->
+<div class="slide" id="s3">
+  <div style="height:100%;padding:34px 48px 44px;display:flex;flex-direction:column">
+    <div class="flex just-sb align-c" style="margin-bottom:14px;flex-shrink:0">
+      <div><div class="eyebrow">Roles &amp; Responsibilities</div><div class="bar" style="margin-bottom:6px"></div><div class="slide-h2" style="font-size:32px">Clear ownership.<br/><span class="tl">No overlap.</span></div></div>
+      <div class="slide-body" style="font-size:13px;max-width:360px;text-align:right;line-height:1.65">Each co-founder runs a distinct set of functions. No committees, no shared accountability. Three equal partners — three clean lanes.</div>
+    </div>
+    <div class="g3" style="flex:1;gap:14px">
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--t50);border-bottom:.5px solid var(--teal);padding:12px 16px">
+          <div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:14px">Aamir</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-top:2px">Co-Founder & CEO</div></div><div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:var(--teal)">33%</div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:7px"><span class="fn-pill fn-tl">📱 Product</span><span class="fn-pill fn-tl">⚙️ Technology</span><span class="fn-pill fn-tl">📣 Marketing</span><span class="fn-pill fn-tl">🤖 Data & AI</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div style="padding:12px 16px;flex:1;display:flex;flex-direction:column;gap:7px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx3)">Owns</div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">AI-native product vision and full platform roadmap</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Technology — build, partner integration, licensing</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Consumer marketing, acquisition and brand positioning</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Data infrastructure, ML models and AI product layer</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Lead fundraising narrative and institutional outreach</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Travel fintech layer — CFAR, Price Freeze, BNPL design</div></div>
+        </div>
+        <div style="padding:9px 16px;background:var(--sf);border-top:.5px solid var(--bd)"><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Direct Reports</div><div class="flex gap8" style="flex-wrap:wrap"><span class="badge b-tl">Head of Technology</span><span class="badge b-tl">Head of Marketing</span><span class="badge b-tl">Data & AI Lead</span></div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--b50);border-bottom:.5px solid var(--b600);padding:12px 16px">
+          <div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:14px">Mohamed</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--b600);margin-top:2px">Co-Founder & President</div></div><div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:var(--b600)">33%</div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:7px"><span class="fn-pill fn-b">💳 Finance</span><span class="fn-pill fn-b">🏗️ Operations</span><span class="fn-pill fn-b">🏢 Business Infrastructure</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div style="padding:12px 16px;flex:1;display:flex;flex-direction:column;gap:7px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx3)">Owns</div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Full P&amp;L ownership and financial controls</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Working capital deployment and cash flow management</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Pakistan operations and on-ground execution</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Business infrastructure — entity, banking, compliance</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Active GCC investor relationships — co-leads fundraising</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Customer experience quality and service standards</div></div>
+        </div>
+        <div style="padding:9px 16px;background:var(--sf);border-top:.5px solid var(--bd)"><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Direct Reports</div><div class="flex gap8" style="flex-wrap:wrap"><span class="badge b-b">Head of Finance</span><span class="badge b-b">Head of Customer Ops</span></div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:var(--a50);border-bottom:.5px solid var(--amb);padding:12px 16px">
+          <div class="flex just-sb align-c"><div><div class="slide-h3" style="font-size:14px">Farman</div><div style="font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amb);margin-top:2px">Co-Founder & Chief Business Officer</div></div><div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;color:var(--amb)">33%</div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:7px"><span class="fn-pill fn-amb">✈️ Suppliers</span><span class="fn-pill fn-amb">🔗 Partners</span><span class="fn-pill fn-amb">🏦 B2B Business</span><span class="fn-pill fn-shared">🤝 Investor Relations</span></div>
+        </div>
+        <div style="padding:12px 16px;flex:1;display:flex;flex-direction:column;gap:7px">
+          <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--tx3)">Owns</div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Airline, hotel and ground supplier partnerships</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Trade and agent channel development</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Strategic partnerships — bank CUGs, fintech, loyalty</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">B2B sales and enterprise account acquisition</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">Corporate travel accounts and TMC relationships</div></div>
+          <div class="flex gap8"><div style="width:5px;height:5px;border-radius:50%;background:var(--amb);flex-shrink:0;margin-top:4px"></div><div style="font-size:11.5px;color:var(--tx2);line-height:1.4">People strategy, culture and HR leadership</div></div>
+        </div>
+        <div style="padding:9px 16px;background:var(--sf);border-top:.5px solid var(--bd)"><div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--tx3);margin-bottom:5px">Direct Reports</div><div class="flex gap8" style="flex-wrap:wrap"><span class="badge b-amb">Head of Supply</span><span class="badge b-amb">Head of HR</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T3 / T6</div>
+</div>
+<!--SLIDE:s3:END-->
+
+<!--SLIDE:s4:START-->
+<div class="slide" id="s4">
+  <div style="height:100%;padding:32px 48px 44px;display:flex;flex-direction:column">
+    <div class="flex just-sb align-c" style="margin-bottom:12px;flex-shrink:0">
+      <div><div class="eyebrow">Building the Team</div><div class="bar" style="margin-bottom:6px"></div><div class="slide-h2" style="font-size:32px">First leaders.<br/><span class="tl">First movers.</span></div></div>
+      <div class="card-nv" style="padding:12px 20px;text-align:center;flex-shrink:0"><div style="font-size:10px;color:var(--t100);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Founding team target</div><div style="font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1">10–12</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">FTEs by Month 6</div></div>
+    </div>
+    <div class="g3" style="gap:14px;flex:1;align-content:start">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--t50);border:.5px solid var(--teal);border-radius:7px;padding:5px 12px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;align-self:flex-start">Reports to Aamir</div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--teal)"><div class="slide-h3" style="font-size:12.5px">Head of Technology</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Platform build, partner asset integration, licensing strategy and engineering roadmap</div><div style="background:var(--t50);color:#085041;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 1–2</div></div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--teal)"><div class="slide-h3" style="font-size:12.5px">Head of Marketing &amp; Growth</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Consumer acquisition, brand, performance marketing — Pakistan and GCC diaspora</div><div style="background:var(--a50);color:var(--amb);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 2–3</div></div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--teal)"><div class="slide-h3" style="font-size:12.5px">Data &amp; AI Lead</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Demand forecasting, pricing intelligence, personalisation engine — Raahi's brain</div><div style="background:var(--a50);color:var(--amb);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 3–4</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--b50);border:.5px solid var(--b600);border-radius:7px;padding:5px 12px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--b600);letter-spacing:.12em;text-transform:uppercase;align-self:flex-start">Reports to Mohamed</div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--b600)"><div class="slide-h3" style="font-size:12.5px">Head of Finance &amp; Compliance</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Financial reporting, regulatory compliance, payment reconciliation — SECP from month one</div><div style="background:var(--t50);color:#085041;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 1–2</div></div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--b600)"><div class="slide-h3" style="font-size:12.5px">Head of Customer Operations</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Support fulfilment, quality assurance, post-booking experience and SLA management</div><div style="background:var(--a50);color:var(--amb);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 3–4</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--a50);border:.5px solid var(--amb);border-radius:7px;padding:5px 12px;font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--amb);letter-spacing:.12em;text-transform:uppercase;align-self:flex-start">Reports to Farman</div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--amb)"><div class="slide-h3" style="font-size:12.5px">Head of Supply &amp; Partnerships</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Airline contracting, hotel inventory, NDC onboarding, trade partners and strategic CUG deals</div><div style="background:var(--t50);color:#085041;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 1–2</div></div>
+        <div style="border:.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;border-left:3px solid var(--amb)"><div class="slide-h3" style="font-size:12.5px">Head of HR &amp; People</div><div style="font-size:11px;color:var(--tx2);line-height:1.4;margin-top:3px">Talent acquisition, culture, performance management and people operations — builds the team that delivers the roadmap</div><div style="background:var(--a50);color:var(--amb);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:6px">Month 2–3</div></div>
+      </div>
+    </div>
+    <div style="background:var(--sf);border:.5px solid var(--bd);border-radius:8px;padding:8px 18px;margin-top:10px;flex-shrink:0;display:flex;gap:22px;align-items:center">
+      <div style="display:flex;align-items:center;gap:8px"><div style="background:var(--t50);color:#085041;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px">Month 1–2</div><span style="font-size:12px;color:var(--tx2)">Critical hire — business cannot launch without</span></div>
+      <div style="width:1px;height:18px;background:var(--bd)"></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="background:var(--a50);color:var(--amb);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px">Month 2–4</div><span style="font-size:12px;color:var(--tx2)">Growth hire — required to scale beyond launch</span></div>
+    </div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T4 / T6</div>
+</div>
+<!--SLIDE:s4:END-->
+
+<!--SLIDE:s5:START-->
+<div class="slide" id="s5">
+  <div style="height:100%;padding:34px 48px 44px;display:flex;flex-direction:column">
+    <div class="flex just-sb align-c" style="margin-bottom:16px;flex-shrink:0">
+      <div><div class="eyebrow">Business Infrastructure</div><div class="bar" style="margin-bottom:6px"></div><div class="slide-h2" style="font-size:32px">What we're standing up<br/><span class="tl">in Year One.</span></div></div>
+      <div class="slide-body" style="font-size:13px;max-width:340px;text-align:right;line-height:1.65">Six pillars. Each with a clear co-founder owner. Built to scale from Pakistan to GCC.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;flex:1">
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">⚙️</div><span class="badge b-tl">Aamir</span></div><div class="slide-h3" style="font-size:13px">Technology Platform</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Partner platform assets integrated from day one</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">AI/LLM APIs sourced at zero cost via founder relationships</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Best-in-class modules licensed where speed beats build</div></div></div></div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">✈️</div><span class="badge b-amb">Farman</span></div><div class="slide-h3" style="font-size:13px">Supply &amp; Partnerships</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">GDS access and Pakistan airline direct contracts — live at launch</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Hotel and ground inventory via existing trade relationships</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">NDC pipeline and bank CUG partner development</div></div></div></div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">💳</div><span class="badge b-b">Mohamed</span></div><div class="slide-h3" style="font-size:13px">Finance &amp; Payments</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Working capital facility and banking relationships in place</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Pakistan payment rails — JazzCash, Easypaisa, cards, BNPL</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">GCC payment infrastructure for diaspora market</div></div></div></div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">📊</div><span class="badge b-tl">Aamir</span></div><div class="slide-h3" style="font-size:13px">Data &amp; Intelligence</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Booking, demand and pricing data infrastructure from day one</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">ML-driven pricing, demand forecasting and personalisation</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Funnel analytics and cohort tracking from first booking</div></div></div></div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">🏢</div><div style="background:var(--sf);color:var(--tx3);font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;border:.5px solid var(--bd)">Mohamed + Aamir</div></div><div class="slide-h3" style="font-size:13px">Legal &amp; Compliance</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Local licensing and entity — SECP registered, operational at launch</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">GCC entity for diaspora and expansion market</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Fintech and insurance product licensing — SECP track</div></div></div></div>
+      <div style="border:.5px solid var(--bd);border-radius:12px;padding:16px;background:#fff;display:flex;flex-direction:column;gap:10px"><div class="flex just-sb align-c"><div style="font-size:22px">👥</div><span class="badge b-amb">Farman</span></div><div class="slide-h3" style="font-size:13px">People &amp; HR</div><div style="display:flex;flex-direction:column;gap:5px;flex:1"><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Talent acquisition and onboarding from month one</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Culture, performance management and team building</div></div><div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.6"></div><div style="font-size:11.5px;color:var(--tx2)">Lean 10–12 FTE founding team operational by Month 6</div></div></div></div>
+    </div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T5 / T6</div>
+</div>
+<!--SLIDE:s5:END-->
+
+<!--SLIDE:s6:START-->
+<div class="slide" id="s6">
+  <div style="height:100%;padding:28px 48px 36px;display:flex;flex-direction:column">
+    <div class="flex just-sb align-c" style="margin-bottom:12px;flex-shrink:0">
+      <div>
+        <div class="eyebrow">Next Steps</div>
+        <div class="bar" style="margin-bottom:6px"></div>
+        <div class="slide-h2" style="font-size:30px">From co-founder alignment<br/><span class="tl">to seed close.</span></div>
+      </div>
+      <div style="background:var(--navy);border-radius:10px;padding:10px 18px;text-align:center;flex-shrink:0">
+        <div style="font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;color:var(--t100);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">Seed target</div>
+        <div style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1">$1.8M</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">Close Q3 2026</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1">
+      <div style="border:.5px solid var(--bd);border-radius:11px;padding:13px 14px;background:#fff;display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><div style="font-size:18px">💰</div><div class="slide-h3" style="font-size:12.5px">Financial Plan Workshop</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Stress-test the 5-year P&amp;L across base, bear and bull GMV scenarios with co-founder input on supply ramp and B2B pipeline</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Align on Year 1 monthly burn rate, working capital drawdown schedule, and the milestone that gates the Series A</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Lock fintech revenue assumptions — CFAR attach rate, Safar Pro subscriber ramp, BNPL mix — so the investor model is watertight</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Agree on founder compensation structure (deferred draw) to preserve runway and signal commitment</div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:11px;padding:13px 14px;background:#fff;display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><div style="font-size:18px">⚙️</div><div class="slide-h3" style="font-size:12.5px">Calibrate Ready-to-Deploy Assets</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Audit co-founder associated platform tech, AI/LLM access and toolsets — each founder surfaces what their network can unlock</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Map Farman's airline and hotel supply contracts against GDS integration timelines — confirm launch inventory is real and bookable</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Document all pre-existing assets, licenses and API credentials — this is the "unfair head start" narrative for investors</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Identify 3–4 capabilities that can be demoed to investors before a single rupee of seed capital is deployed</div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:11px;padding:13px 14px;background:#fff;display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><div style="font-size:18px">📋</div><div class="slide-h3" style="font-size:12.5px">Year 1 Project Plan</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Month-by-month Gantt across Product, Supply, Marketing, Finance and Compliance — tied directly to the financial model</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">5 non-negotiable Year 1 milestones: platform live · CFAR regulatory filing · first B2B account · first CUG deal · SECP compliance</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Hiring plan locked to Gantt — no role created without a clear deliverable it unlocks</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Define the Series A gate: specific GMV run-rate, CFAR attach rate and months of data that trigger the raise</div></div>
+      </div>
+      <div style="border:.5px solid var(--bd);border-radius:11px;padding:13px 14px;background:var(--sf);display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><div style="font-size:18px">🏢</div><div class="slide-h3" style="font-size:12.5px">Company Formation</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">Singapore PTE Ltd</strong> — preferred for GCC and institutional investors; clean repatriation, IP protection, Fintech sandbox; 2–4 week setup</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">Delaware C-Corp</strong> — if targeting US VCs or planning a US-listed exit; standard for Silicon Valley term sheets and ESOP</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--teal)">Recommendation:</strong> Singapore holdco → Pakistan Pvt Ltd opco → future KSA entity; maximises investor comfort, operations Pakistan-domiciled</div></div>
+        <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--b600);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Open USD account (DBS/HSBC Singapore), establish 10–15% ESOP pool, clean cap table before first investor call</div></div>
+      </div>
+      <div style="border:.5px solid var(--teal);border-radius:11px;padding:13px 14px;background:var(--t50);display:flex;flex-direction:column;gap:7px;grid-column:2/4">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px"><div style="font-size:18px">🤝</div><div class="slide-h3" style="font-size:12.5px;color:var(--teal)">Investor Outreach</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);margin-bottom:5px">Close Network · First</div>
+            <div class="flex gap8" style="margin-bottom:4px"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Mohamed &amp; Aamir's direct GCC contacts — Bahrain, KSA, UAE family offices; target 3–5 cheques of $150K–$400K</div></div>
+            <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45">Pakistan diaspora angels — operators who understand the market thesis; close 60–70% of seed before approaching VCs</div></div>
+          </div>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);margin-bottom:5px">Regional VCs</div>
+            <div class="flex gap8" style="margin-bottom:4px"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">STV</strong> · <strong style="color:var(--tx)">BECO Capital</strong> · <strong style="color:var(--tx)">Global Ventures</strong> · <strong style="color:var(--tx)">Wamda Capital</strong></div></div>
+            <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">i2i Ventures</strong> · <strong style="color:var(--tx)">Sarmayacar</strong> — Pakistan-focused, understand the regulatory and market complexity firsthand</div></div>
+          </div>
+          <div>
+            <div style="font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);margin-bottom:5px">Travel &amp; Global</div>
+            <div class="flex gap8" style="margin-bottom:4px"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">Travel Capitalist Ventures</strong> — travel-native VC, deep OTA and fintech thesis alignment</div></div>
+            <div class="flex gap8"><div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px;opacity:.7"></div><div style="font-size:10.5px;color:var(--tx2);line-height:1.45"><strong style="color:var(--tx)">Plug &amp; Play</strong> — global accelerator with MENA and fintech verticals; strategic value beyond capital</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(15,110,86,.12);border-radius:7px;padding:7px 10px;margin-top:3px;font-size:10.5px;color:#085041;line-height:1.45"><strong>Sequencing rule:</strong> Warm intros convert 8x better than cold outreach. Partial close from network creates FOMO before institutional conversations begin.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"></div>
+  <div class="slide-brand"><svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M12 7.5L8.5 3.5V5.5L2 7v2l6.5-1.5v2.5l-1.5 1 .5 2L10 11.5l3-2L12 7.5z" fill="#D4D1C8"/></svg>TICKETISTAN</div>
+  <div class="slide-num">T6 / T6</div>
+</div>
+<!--SLIDE:s6:END-->
+<!--SLIDE-WRAP-END-->
+
+</div><!-- end slide-wrap -->
+</div><!-- end slide-wrap-holder -->
+
+<div class="nav-row">
+  <button class="nav-btn" id="btnPrev" onclick="navigate(-1)" disabled>← Prev</button>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:14px">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:16.67%"></div></div>
+    <div class="slide-counter" id="slideCounter">T1 / T6</div>
+  </div>
+  <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+</div>
+<div style="text-align:center;margin-top:8px">
+  <span class="kb-hint">← → keyboard navigation · Confidential · April 2026 · Team &amp; Organisation · 6 slides</span>
+</div>
+</div>
+
+<script id="nav-script">
+var cur=1;var total=6;
+function navigate(dir){
+  /* commit any open text edit before changing slide */
+  if(document.activeElement&&document.activeElement.contentEditable==='true'){document.activeElement.blur();}
+  var next=cur+dir;if(next<1||next>total)return;
+  document.getElementById('s'+cur).classList.remove('active');
+  cur=next;
+  document.getElementById('s'+cur).classList.add('active');
+  document.getElementById('slideCounter').textContent='T'+cur+' / T6';
+  document.getElementById('progressFill').style.width=(cur/total*100)+'%';
+  document.getElementById('btnPrev').disabled=cur===1;
+  document.getElementById('btnNext').disabled=cur===total;
+  setTimeout(fitDeck,30);
+}
+document.addEventListener('keydown',function(e){
+  if(window._editMode||window._dragMode)return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')navigate(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')navigate(-1);
+});
+</script>
+
+<!--EDITOR-START-->
+<div id="edit-bar">
+  <button id="edit-toggle" class="ebar-btn" onclick="toggleEdit()">✏️ Text Edit</button>
+  <button id="drag-toggle" class="ebar-btn" onclick="toggleDrag()">⤢ Move Elements</button>
+  <span id="edit-hint">Turn on a mode to edit text or reposition elements on any slide</span>
+  <span id="change-count">0 changes</span>
+  <button id="undo-btn" class="ebar-btn" onclick="undoLast()">↩ Undo</button>
+  <button id="dl-btn" class="ebar-btn" onclick="downloadHTML()">⬇ Download Edited Deck</button>
+</div>
+<div class="drag-tooltip" id="drag-tooltip">Drag to reposition · Esc to cancel · Arrow keys to nudge</div>
+
+<script id="editor-script">
+window._editMode=false;window._dragMode=false;
+var _changeCount=0;var _history=[];
+
+function toggleEdit(){
+  if(window._dragMode)toggleDrag();
+  window._editMode=!window._editMode;
+  var btn=document.getElementById('edit-toggle');
+  var hint=document.getElementById('edit-hint');
+  if(window._editMode){
+    btn.textContent='🔒 Exit Text Edit';btn.classList.add('active');
+    hint.textContent='Double-click any text to edit · Enter to confirm · Esc to cancel';
+    document.querySelectorAll('.slide').forEach(function(s){s.classList.add('slide-editable');});
+    enableEditing();
+  }else{
+    btn.textContent='✏️ Text Edit';btn.classList.remove('active');
+    hint.textContent=_changeCount>0?_changeCount+' change'+(_changeCount>1?'s':'')+' saved — click Download':'Turn on a mode to edit text or reposition elements';
+    document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('slide-editable');});
+    document.querySelectorAll('[data-editable]').forEach(function(el){el.removeAttribute('contenteditable');});
+  }
+  updateUI();
+}
+
+function enableEditing(){
+  document.querySelectorAll('.slide *').forEach(function(el){
+    if(el.dataset.editable)return;
+    if(el.closest('.slide-footer,.slide-brand,.slide-num,svg,button,#edit-bar,#drag-tooltip'))return;
+    if((el.children.length===0||el.tagName==='TD'||el.tagName==='TH')&&el.textContent.trim())setupEditable(el);
+  });
+}
+
+function setupEditable(el){
+  el.dataset.editable='1';
+  el.addEventListener('dblclick',function(e){
+    if(!window._editMode)return;e.stopPropagation();
+    _history.push({type:'text',el:el,oldHTML:el.innerHTML});
+    el.contentEditable='true';el.focus();
+    var r=document.createRange();r.selectNodeContents(el);
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+  });
+  el.addEventListener('blur',function(){
+    if(el.contentEditable!=='true')return;
+    el.removeAttribute('contenteditable');
+    var last=_history[_history.length-1];
+    if(last&&last.type==='text'&&last.el===el&&last.oldHTML!==el.innerHTML){_changeCount++;updateUI();}
+    else if(last&&last.el===el){_history.pop();}
+  });
+  el.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();el.blur();}
+    if(e.key==='Escape'){var last=_history[_history.length-1];if(last&&last.el===el){el.innerHTML=last.oldHTML;_history.pop();}el.blur();}
+  });
+}
+
+var _draggingEl=null,_dragStartX=0,_dragStartY=0,_elStartLeft=0,_elStartTop=0;
+var _hoverEl=null;
+
+function toggleDrag(){
+  if(window._editMode)toggleEdit();
+  window._dragMode=!window._dragMode;
+  var btn=document.getElementById('drag-toggle');
+  var hint=document.getElementById('edit-hint');
+  var tip=document.getElementById('drag-tooltip');
+  if(window._dragMode){
+    btn.textContent='🔒 Exit Move Mode';btn.classList.add('active');
+    hint.textContent='Click & drag any element to reposition · Arrow keys to nudge';
+    tip.classList.add('show');
+    document.querySelectorAll('.slide').forEach(function(s){s.classList.add('drag-mode');});
+    document.addEventListener('mousedown',onDragStart);
+    document.addEventListener('mousemove',onDragMove);
+    document.addEventListener('mousemove',onDragHover);
+    document.addEventListener('mouseup',onDragEnd);
+    document.addEventListener('keydown',onDragKey);
+  }else{
+    btn.textContent='⤢ Move Elements';btn.classList.remove('active');
+    hint.textContent=_changeCount>0?_changeCount+' change'+(_changeCount>1?'s':'')+' saved — click Download':'Turn on a mode to edit text or reposition elements';
+    tip.classList.remove('show');
+    document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('drag-mode');});
+    document.removeEventListener('mousedown',onDragStart);
+    document.removeEventListener('mousemove',onDragMove);
+    document.removeEventListener('mousemove',onDragHover);
+    document.removeEventListener('mouseup',onDragEnd);
+    document.removeEventListener('keydown',onDragKey);
+    if(_hoverEl){_hoverEl.classList.remove('drag-highlight');_hoverEl=null;}
+  }
+  updateUI();
+}
+
+function getGrabTarget(fromEl){
+  var activeSlide=document.querySelector('.slide.active');
+  if(!activeSlide||!activeSlide.contains(fromEl))return null;
+  var target=fromEl;
+  while(target&&target!==activeSlide){
+    if(target.closest('.slide-footer,.slide-brand,.slide-num,#edit-bar,.drag-tooltip,button'))return null;
+    var cs=getComputedStyle(target);var d=cs.display;
+    var isInline=['SPAN','SVG','STRONG','EM','B','I','A','SMALL','SUB','SUP','BR'].includes(target.tagName);
+    var isBlock=d==='block'||d==='flex'||d==='grid'||d==='inline-flex'||d==='inline-grid';
+    if(isBlock&&!isInline){var r=target.getBoundingClientRect();if(r.width>10&&r.height>6)return target;}
+    target=target.parentElement;
+  }
+  return null;
+}
+
+function getTranslate(el){
+  var t=el.style.transform||'';
+  var m=t.match(/translate\(([\d.-]+)px,\s*([\d.-]+)px\)/);
+  return m?{x:parseFloat(m[1]),y:parseFloat(m[2])}:{x:0,y:0};
+}
+
+function onDragHover(e){
+  if(!window._dragMode||_draggingEl)return;
+  var t=getGrabTarget(e.target);
+  if(t===_hoverEl)return;
+  if(_hoverEl)_hoverEl.classList.remove('drag-highlight');
+  _hoverEl=t;
+  if(t)t.classList.add('drag-highlight');
+}
+
+function onDragStart(e){
+  if(!window._dragMode||e.button!==0)return;
+  var target=getGrabTarget(e.target);if(!target)return;
+  e.preventDefault();e.stopPropagation();
+  var base=getTranslate(target);
+  _history.push({type:'drag',el:target,oldTransform:target.style.transform||'',oldStyle:target.getAttribute('style')||''});
+  _draggingEl=target;_dragStartX=e.clientX;_dragStartY=e.clientY;_elStartLeft=base.x;_elStartTop=base.y;
+  target.classList.add('dragging-el');target.style.zIndex='50';target.style.position='relative';
+}
+
+function onDragMove(e){
+  if(!_draggingEl)return;e.preventDefault();
+  var dx=e.clientX-_dragStartX,dy=e.clientY-_dragStartY;
+  _draggingEl.style.transform='translate('+(_elStartLeft+dx)+'px,'+(_elStartTop+dy)+'px)';
+}
+
+function onDragEnd(){
+  if(!_draggingEl)return;
+  _draggingEl.classList.remove('dragging-el');_draggingEl.style.zIndex='';
+  var last=_history[_history.length-1];
+  if(_draggingEl.style.transform!==(last&&last.oldTransform)){_changeCount++;updateUI();}
+  else{_history.pop();if(last)_draggingEl.style.transform=last.oldTransform;}
+  _draggingEl=null;
+}
+
+function onDragKey(e){
+  if(e.key==='Escape'&&_draggingEl){
+    var last=_history[_history.length-1];
+    if(last&&last.type==='drag'){_draggingEl.style.transform=last.oldTransform;_history.pop();}
+    _draggingEl.classList.remove('dragging-el');_draggingEl.style.zIndex='';_draggingEl=null;return;
+  }
+  if(window._dragMode&&!_draggingEl&&_hoverEl){
+    var step=e.shiftKey?8:1;var c=getTranslate(_hoverEl);
+    if(e.key==='ArrowLeft'){e.preventDefault();_hoverEl.style.transform='translate('+(c.x-step)+'px,'+c.y+'px)';}
+    if(e.key==='ArrowRight'){e.preventDefault();_hoverEl.style.transform='translate('+(c.x+step)+'px,'+c.y+'px)';}
+    if(e.key==='ArrowUp'){e.preventDefault();_hoverEl.style.transform='translate('+c.x+'px,'+(c.y-step)+'px)';}
+    if(e.key==='ArrowDown'){e.preventDefault();_hoverEl.style.transform='translate('+c.x+'px,'+(c.y+step)+'px)';}
+  }
+}
+
+function undoLast(){
+  if(!_history.length)return;
+  var last=_history.pop();
+  if(last.type==='text'){last.el.innerHTML=last.oldHTML;delete last.el.dataset.changed;}
+  else if(last.type==='drag'){last.el.setAttribute('style',last.oldStyle);}
+  _changeCount=Math.max(0,_changeCount-1);updateUI();
+}
+
+function updateUI(){
+  var ce=document.getElementById('change-count'),dl=document.getElementById('dl-btn'),un=document.getElementById('undo-btn');
+  ce.textContent=_changeCount+' change'+(_changeCount>1?'s':'');
+  if(_changeCount>0){ce.classList.add('show');dl.classList.add('show');un.classList.add('show');}
+  else{ce.classList.remove('show');dl.classList.remove('show');un.classList.remove('show');}
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DOWNLOAD v12 — DEFINITIVE FIX
+   
+   Core approach: deep-clone the document, then EXPLICITLY copy
+   innerHTML from every live slide element into the clone.
+   This guarantees hidden slides are captured correctly regardless
+   of how the browser serialises display:none elements.
+───────────────────────────────────────────────────────────── */
+function downloadHTML(){
+
+  /* Step 1: commit any in-progress text edit */
+  if(document.activeElement&&document.activeElement.contentEditable==='true'){
+    document.activeElement.blur();
+  }
+
+  /* Step 2: deep-clone the full document */
+  var clone=document.documentElement.cloneNode(true);
+
+  /* Step 3: for EVERY slide, explicitly copy live DOM innerHTML into clone.
+     This is the definitive fix — we do NOT rely on outerHTML capturing
+     hidden slides; we force-inject the current content slide by slide. */
+  for(var i=1;i<=total;i++){
+    var liveSlide=document.getElementById('s'+i);
+    var cloneSlide=clone.querySelector('#s'+i);
+    if(liveSlide&&cloneSlide){
+      cloneSlide.innerHTML=liveSlide.innerHTML;
+    }
+  }
+
+  /* Step 4: in the clone, reset all slides to hidden, set s1 as active */
+  var cloneSlides=clone.querySelectorAll('.slide');
+  cloneSlides.forEach(function(s){
+    s.classList.remove('active');
+    s.removeAttribute('style'); /* remove any stray inline styles */
+  });
+  var s1clone=clone.querySelector('#s1');
+  if(s1clone){s1clone.classList.add('active');}
+
+  /* Step 5: reset progress bar in clone */
+  var pf=clone.querySelector('#progressFill');
+  if(pf){pf.style.width='16.67%';}
+
+  /* Step 6: reset slide counter text in clone */
+  var sc=clone.querySelector('#slideCounter');
+  if(sc){sc.textContent='T1 / T6';}
+
+  /* Step 7: re-enable prev/next buttons to default state */
+  var bp=clone.querySelector('#btnPrev');
+  var bn=clone.querySelector('#btnNext');
+  if(bp){bp.disabled=true;}
+  if(bn){bn.disabled=false;}
+
+  /* Step 8: serialise the clone to an HTML string */
+  var html='<!DOCTYPE html>\n'+clone.outerHTML;
+
+  /* Step 9: fix the nav script's cur variable back to 1 */
+  html=html.replace(/var cur=\d+;/,'var cur=1;');
+
+  /* Step 10: strip the entire editor section (from <!--EDITOR-START--> onwards) */
+  var editorStart=html.indexOf('<!--EDITOR-START-->');
+  if(editorStart!==-1){
+    html=html.substring(0,editorStart)+'\n</body>\n</html>';
+  }
+
+  /* Step 11: clean up any editor artefacts left on elements */
+  html=html
+    .replace(/ contenteditable="[^"]*"/g,'')
+    .replace(/ data-editable="[^"]*"/g,'')
+    .replace(/ data-changed="[^"]*"/g,'')
+    .replace(/\bslide-editable\b\s*/g,'')
+    .replace(/\bdrag-mode\b\s*/g,'')
+    .replace(/\bdragging-el\b\s*/g,'')
+    .replace(/\bdrag-highlight\b\s*/g,'');
+
+  /* Step 12: clean up empty class attributes left after artefact removal */
+  html=html.replace(/ class=""/g,'').replace(/ class=" "/g,'');
+
+  /* Step 13: trigger the download */
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Ticketistan_Team_Slides_v12_edited.html';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},100);
+}
+
+document.body.style.paddingBottom='60px';
+</script>
+<!--EDITOR-END-->
+</body>
+</html>
